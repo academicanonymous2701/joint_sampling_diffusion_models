@@ -1,0 +1,15 @@
+# @package _global_
+
+training:
+  soft_logits: true
+  reg_with_base_weight: 0.0 
+  reg_weight: 0.0 
+  loss_last: true
+
+drafting_features: 
+  tokens: sampled 
+
+drafting_params: 
+  speculation_len: 7
+
+tag: 'kl_random'

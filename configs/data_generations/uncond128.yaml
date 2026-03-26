@@ -1,0 +1,19 @@
+# @package _global_
+
+mode: uncond_gen
+
+sampling:
+  max_new_tokens: 127
+  diffusion_steps: ${.max_new_tokens}
+  add_bos_token: true
+  use_marginals: true
+  mask_eos: true
+  
+lm_eval:
+  output_path: <path_to_save_generated_samples> # $SCRATCH/diffusion/eagle/uncond/09.04_entropy128_${seed}
+
+uncond_generation:
+  num_samples: 100_000
+
+loader:
+  batch_size: 4

@@ -1,0 +1,12 @@
+# @package _global_
+
+base_model: 'Dream-org/Dream-v0-Instruct-7B'
+
+defaults:
+  - override /data: entropy_history_20K_lowtemp_metamath_256 # entropy_history_100K_metamath_128
+
+loader:
+  batch_size: 4
+
+drafting_params: 
+  speculation_len: 3

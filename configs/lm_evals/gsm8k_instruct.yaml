@@ -1,0 +1,19 @@
+# @package _global_
+
+mode: eval 
+
+sampling: 
+  max_new_tokens: 256
+  mask_eos: false
+  temperature: 1.0
+  add_bos_token: false
+  top_p: 0.9
+
+loader: 
+  eval_batch_size: 4
+
+lm_eval: 
+  tasks: gsm8k_cot
+  limit: 250
+  num_fewshot: 0
+  apply_chat_template: true

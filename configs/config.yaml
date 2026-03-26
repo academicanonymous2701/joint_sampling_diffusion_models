@@ -1,0 +1,120 @@
+defaults:
+  - _self_
+  - /callbacks: [checkpoint_every_n_steps, learning_rate_monitor]
+  - /data: entropy_history_100K_uncond_128 #  / entropy_1M_uncond_512 / origin_500K_uncond / entropy_1M_uncond_128 / entropy_history_100K_uncond_128 / entropy_history_100K_uncond_128
+  - /model: one
+  - /strategy: ddp
+  - /lr_scheduler: constant_warmup
+
+mode: train  # train / eval / uncond_gen
+val_check_interval_global_step: 20_000 # 5_000 # 10_000 # 1_000 # 5_000 # 20_000
+timestep: '00.00.000000'
+
+seed: 1
+base_model: 'Dream-org/Dream-v0-Base-7B'
+tag: ''
+
+drafting_params:
+  speculation_len: 1
+  noising: 'random'
+  unmasking: 'entropy'
+  unmask_per_unroll: 1
+  
+drafting_features: 
+  tokens : 'sampled' # 'sampled' 'complete' 'base' 'repeated'
+  use_base_features: true
+
+training:
+  weighing_factor: 'none' 
+  soft_logits: false 
+  short_inputs: false
+  reg_type: 'l1' # 'mse' / 'l1'
+  reg_weight: 0.1
+  reg_with_base_weight: 0.1
+  kl_weight: 1.0
+  compute_generative_perplexity: false
+  num_gen_sample: 16
+  generative_ppl_models: q7b # d7b,q7b
+  sampled_spec_idx: true
+  sampled_spec_idx_weight: 0.5
+  layerwise_feats: false
+
+sampling: 
+  max_new_tokens: ${data.max_response_length}
+  diffusion_steps: ${div_up:${.max_new_tokens}, ${eval:${drafting_params.speculation_len} + 1}}
+  decoding_strategy : fixed # fixed / adaptive / ebm_big / ebm_small
+  add_bos_token: true
+  temperature: 1.0
+  top_p: 1.0
+  alg: entropy
+  confidence_thres: -1.5
+  max_spec_length: ${drafting_params.speculation_len}
+  alg_temp: null
+  use_marginals: false
+  mask_eos: true
+  clipped_probs: false
+  adaptive_mixture: 0.5
+
+loader:
+  global_batch_size: 32
+  eval_global_batch_size: ${.global_batch_size}
+  # Note: batch_size and eval_batch_size are **per machine**
+  batch_size: 8 # ${div_up:${.global_batch_size}, ${eval:${trainer.devices} * ${trainer.num_nodes}}}
+  eval_batch_size: 4 # ${div_up:${.eval_global_batch_size}, ${eval:${trainer.devices} * ${trainer.num_nodes}}}
+  num_workers: ${eval:"len(__import__('os').sched_getaffinity(0))"}
+  pin_memory: True
+
+lm_eval: 
+  ckpt_path: ./runs/sampled_True_one_entropy_1M_uncond_08.19.092307/checkpoints/last.ckpt
+  gpu_id: 0
+  tasks: mbpp # gsm8k_cot / gsm8k_cot_zeroshot / mbpp / humaneval
+  output_path: ./runs/lm_eval/${timestep}
+  log_samples: true
+  mauve_ref_path : ./runs/lm_eval/09.fd.190201/gen_ppl_eval/0908.090455/samples.json
+  apply_chat_template: null
+  
+uncond_generation:
+  num_samples: 10
+  mode : 'metamath' # 'uncond' / 'metamath'
+  
+optim:
+  weight_decay: 0
+  lr: 5e-5
+  beta1: 0.9
+  beta2: 0.999
+  eps: 1e-8
+
+trainer:
+  _target_: lightning.Trainer
+  accelerator: cuda
+  num_nodes: ${node_count:}
+  devices: ${device_count:}
+  accumulate_grad_batches: ${div_up:${loader.global_batch_size}, ${eval:${trainer.devices} * ${loader.batch_size} * ${trainer.num_nodes}}}
+  gradient_clip_val: 1.0
+  precision: 'bf16'
+  num_sanity_val_steps: 0
+  max_steps: 1_000_000 # 500_000 # 340_037 # 17_037 # 177_000 # 17_700
+  log_every_n_steps: 10
+  limit_train_batches: 1.0   # train on full dataset, can be used to toggle quick run
+  limit_val_batches: 1.0     # validate on full dataset, can be used to toggle quick run
+  val_check_interval: ${eval:${val_check_interval_global_step} * ${trainer.accumulate_grad_batches}}
+  check_val_every_n_epoch: null
+
+wandb:
+  project: dream_drafter
+  notes: Mulan for text
+  group: null
+  job_type: null
+  name: ${tag}${drafting_features.tokens}_${drafting_features.use_base_features}_${model.name}_${data.name}_${timestep}
+  id: null
+
+hydra:
+  run:
+    dir: ./runs/${wandb.name}/hydra/${data.name}/${timestep}
+  job:
+    chdir: true
+
+checkpointing:
+  save_dir: ./runs/${wandb.name}
+  resume_from_ckpt: False
+  resume_ckpt_path: ''

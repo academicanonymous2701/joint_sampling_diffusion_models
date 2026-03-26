@@ -1,0 +1,5 @@
+name: entropy_history_100K_uncond_128
+data_path: '<path_to_save_data>' # $SCRATCH/diffusion/eagle/uncond/09.04_entropy128_100/uncond_generation/tokenized_generated_samples.pt
+data_format: history_based_tokenized
+max_response_length: 127
+cache_dir: '<cache_dir_for_quick_access>' # $SCRATCH/diffusion/eagle/uncond/09.04_entropy128_100/uncond_generation/

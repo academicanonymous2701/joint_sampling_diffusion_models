@@ -1,0 +1,6 @@
+name: one
+base_model: ${base_model}
+speculation_heads: ${drafting_params.speculation_len}
+n_layers: 1
+shared_params: true
+disable_attn: false

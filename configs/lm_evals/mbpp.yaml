@@ -1,0 +1,16 @@
+# @package _global_
+
+mode: eval 
+
+sampling: 
+  max_new_tokens: 512
+  mask_eos: false
+  temperature: 0.2
+
+loader: 
+  eval_batch_size: 4
+
+lm_eval: 
+  tasks: mbpp
+  limit: 250
+  num_fewshot: 3

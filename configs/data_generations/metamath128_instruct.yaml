@@ -1,0 +1,23 @@
+# @package _global_
+
+mode: uncond_gen
+
+base_model: 'Dream-org/Dream-v0-Instruct-7B'
+
+sampling:
+  max_new_tokens: 256
+  diffusion_steps: ${.max_new_tokens}
+  add_bos_token: false
+  use_marginals: true
+  mask_eos: false
+  temperature: 0.1
+  top_p: 0.9
+  
+lm_eval:
+  output_path: <path_to_save_generated_samples> # $SCRATCH/diffusion/eagle/uncond/09.18_instruct_entropy_metamath128_${seed}
+
+uncond_generation:
+  num_samples: 20_000
+
+loader:
+  batch_size: 4

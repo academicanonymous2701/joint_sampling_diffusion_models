@@ -1,0 +1,8 @@
+# @package _global_
+
+data : entropy_history_100K_uncond_128
+
+base_model: 'Dream-org/Dream-v0-Base-7B'
+
+drafting_params: 
+  speculation_len: 3

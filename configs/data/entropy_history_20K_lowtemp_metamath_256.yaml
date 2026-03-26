@@ -1,0 +1,5 @@
+name: entropy_history_20K_lowtemp_metamath_256
+data_path: '<path_to_save_data>' # $SCRATCH/diffusion/eagle/uncond/09.18_instruct_entropy_metamath128_100/uncond_generation/tokenized_generated_samples.pt
+data_format: history_based_tokenized
+max_response_length: 256
+cache_dir: '<cache_dir_for_quick_access>' # $SCRATCH/diffusion/eagle/uncond/09.18_instruct_entropy_metamath128_100/uncond_generation/
