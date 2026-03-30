@@ -4,6 +4,8 @@ We introduce **ADJUST**, a novel way to approximately sample multiple tokens fro
 
 This codebase is anonymized for ICML 2026 double-blind peer-review. The code has three broad categorization : 
 
+![ADJUST Figure](figs/adjust_fig.png)
+
 ## Code Organization
 1. ```jointsampler.py```: Lightning module having the core training/inference logic
 2. ```eval.py```: Adds support for LMEval based evaluation
